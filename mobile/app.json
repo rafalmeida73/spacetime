@@ -2,9 +2,8 @@
   "expo": {
     "name": "mobile",
     "slug": "mobile",
+    "scheme": "nlwspacetime",
     "version": "1.0.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ]
+    "assetBundlePatterns": ["**/*"]
   }
 }
