@@ -3,10 +3,21 @@ import { prisma } from '../lib/prisma'
 import { z } from "zod"
 
 export async function memoriesRoutes(app: FastifyInstance) {
+  app.addHook('preHandler', async (request) => {
+    await request.jwtVerify()
+  })
+
   app.get('/memories', async (request, reply) => {
+
+
+    const { sub } = request.user
+
     const memories = await prisma.memory.findMany({
       orderBy: {
         createdAt: 'asc'
+      },
+      where: {
+        userId: sub
       }
     })
 
@@ -32,6 +43,10 @@ export async function memoriesRoutes(app: FastifyInstance) {
       }
     })
 
+    if (!memory.isPublic && memory.userId !== request.user.sub) {
+      return reply.status(401).send()
+    }
+
     return memory
   })
 
@@ -43,13 +58,14 @@ export async function memoriesRoutes(app: FastifyInstance) {
     })
 
     const { content, coverUrl, isPublic } = bodySchema.parse(request.body)
+    const { sub } = request.user
 
     const memory = await prisma.memory.create({
       data: {
         content,
         isPublic,
         coverUrl,
-        userId: "5040faae-c20a-47f4-bfe2-538eaa344722"
+        userId: sub
       }
     })
 
@@ -71,8 +87,17 @@ export async function memoriesRoutes(app: FastifyInstance) {
     const { id } = paramsSchema.parse(request.params)
     const { content, coverUrl, isPublic } = bodySchema.parse(request.params)
 
+    let memory = await prisma.memory.findUniqueOrThrow({
+      where: {
+        id
+      }
+    })
 
-    const memory = await prisma.memory.update({
+    if (memory.userId !== request.user.sub) {
+      return reply.status(401).send()
+    }
+
+    memory = await prisma.memory.update({
       where: {
         id
       },
@@ -93,6 +118,17 @@ export async function memoriesRoutes(app: FastifyInstance) {
     })
 
     const { id } = paramsSchema.parse(request.params)
+
+    const memory = await prisma.memory.findUniqueOrThrow({
+      where: {
+        id
+      }
+    })
+
+    if (memory.userId !== request.user.sub) {
+      return reply.status(401).send()
+    }
+
 
     await prisma.user.delete({
       where: {
