@@ -1,12 +1,6 @@
-import { StatusBar } from 'expo-status-bar'
 import React, { useEffect } from 'react'
-import { ImageBackground, Text, TouchableOpacity, View } from 'react-native'
-import { useFonts, Roboto_400Regular, Roboto_700Bold } from "@expo-google-fonts/roboto"
-import { BaiJamjuree_700Bold } from "@expo-google-fonts/bai-jamjuree"
-import blurBg from '../src/assets/bg-blur.png'
-import Stripes from '../src/assets/stripes.svg'
+import { Text, TouchableOpacity, View } from 'react-native'
 import NlwLogo from '../src/assets/nlw-spacetime-logo.svg'
-import { styled } from 'nativewind'
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session'
 import { api } from '../src/lib/api/api'
 import * as SecureStore from 'expo-secure-store';
@@ -18,15 +12,9 @@ const discovery = {
   revocationEndpoint: 'https://github.com/settings/connections/applications/bcc8f95b63ed045be699',
 };
 
-const StyledStripes = styled(Stripes)
 
 export default function App() {
   const router = useRouter()
-  const [fontsLoaded] = useFonts({
-    Roboto_400Regular,
-    Roboto_700Bold,
-    BaiJamjuree_700Bold
-  })
 
   const [request, response, promptAsync] = useAuthRequest(
     {
@@ -53,6 +41,7 @@ export default function App() {
   }
 
   useEffect(() => {
+    console.log(response)
     if (response?.type === 'success') {
       const { code } = response.params;
 
@@ -60,17 +49,11 @@ export default function App() {
     }
   }, [response])
 
-  if (!fontsLoaded) {
-    return null
-  }
 
   return (
-    <ImageBackground
-      source={blurBg}
-      className=" relative px-8 py-10 flex-1 items-center bg-gray-900"
-      imageStyle={{ position: 'absolute', left: "-100%" }}
+    <View
+      className=" px-8 py-10 flex-1 items-center "
     >
-      <StyledStripes className='absolute left-2' />
 
       <View className='flex-1 items-center justify-center gap-6'>
         <NlwLogo />
@@ -95,7 +78,6 @@ export default function App() {
 
       <Text className='text-center font-body text-sm leading-relaxed text-gray-200'>Feito com 💜 no NLW da Rocketseat</Text>
 
-      <StatusBar style="light" translucent />
-    </ImageBackground>
+    </View>
   )
 }
