@@ -14,7 +14,7 @@ export function SignIn() {
         <span className="underline ">
           Crie sua conta
         </span>
-        e salve suas memórias!
+        {" "} e salve suas memórias!
       </p>
     </a>
   );
