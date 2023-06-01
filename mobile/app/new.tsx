@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useState } from 'react'
 import * as ImagePicker from 'expo-image-picker'
 import * as SecureStore from 'expo-secure-store'
+import { api } from '../src/lib/api/api'
 
 export default function NewMemory() {
   const { bottom, top } = useSafeAreaInsets()
@@ -39,6 +40,46 @@ export default function NewMemory() {
       // deu erro mas eu não tratei
       console.error(err)
     }
+  }
+
+  async function handleCreateMemory() {
+    const token = await SecureStore.getItemAsync('token')
+
+    let coverUrl = ''
+
+    if (preview) {
+      const uploadFormData = new FormData()
+
+      uploadFormData.append('file', {
+        uri: preview,
+        name: 'image.jpg',
+        type: 'image/jpg',
+      } as any)
+
+      const uploadResponse = await api.post('/upload', uploadFormData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      coverUrl = uploadResponse.data.fileUrl
+    }
+
+    await api.post(
+      '/memories',
+      {
+        content,
+        isPublic,
+        coverUrl,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+
+    router.push('/memories')
   }
 
 
@@ -102,7 +143,7 @@ export default function NewMemory() {
 
         <TouchableOpacity
           activeOpacity={0.7}
-
+          onPress={handleCreateMemory}
           className="items-center self-end rounded-full bg-green-500 px-5 py-2"
         >
           <Text className="font-alt text-sm uppercase text-black">Salvar</Text>

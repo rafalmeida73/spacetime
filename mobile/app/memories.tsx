@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import ptBR from 'dayjs/locale/pt-br'
+import { api } from '../src/lib/api/api'
 
 dayjs.locale(ptBR)
 
@@ -29,21 +30,21 @@ export default function NewMemory() {
     router.push('/')
   }
 
-  // async function loadMemories() {
-  //   const token = await SecureStore.getItemAsync('token')
+  async function loadMemories() {
+    const token = await SecureStore.getItemAsync('token')
 
-  //   const response = await api.get('/memories', {
-  //     headers: {
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //   })
+    const response = await api.get('/memories', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
 
-  //   setMemories(response.data)
-  // }
+    setMemories(response.data)
+  }
 
-  // useEffect(() => {
-  //   loadMemories()
-  // }, [])
+  useEffect(() => {
+    loadMemories()
+  }, [])
 
   return (
     <ScrollView
